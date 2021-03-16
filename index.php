@@ -1,3 +1,11 @@
+<?php 
+    session_start();
+    if(isset($_SESSION['user']))
+    {
+        header("Location: home.php");
+        exit();
+    }
+?>
 <!doctype html>
 <html lang="en">
 
@@ -16,18 +24,18 @@
 <body>
     <div class="container mt-5">
         <div class="text-center">
-        <h2>Login</h2>
+            <h2>Login</h2>
         </div>
-        <form action="/controller/AuthController.php" method="post">
+        <form>
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Email address</label>
-                <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+                <input type="text" id="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
             </div>
             <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" id="exampleInputPassword1" required>
+                <input type="password" id="password" class="form-control" id="exampleInputPassword1">
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button id="login" type="button" class="btn btn-primary">Submit</button>
         </form>
     </div>
     <!-- Optional JavaScript; choose one of the two! -->
@@ -35,6 +43,55 @@
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous">
+    </script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script>
+    $(function() {
+        $("#login").on('click', () => {
+            var email = $("#email").val();
+            var password = $("#password").val();
+            if (email == "" || password == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Email atau password kosong!',
+                    text: 'Silakan cek kembali email dan password',
+                    timer: 2000
+                })
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/controller/AuthController.php',
+                    data: {
+                        email: email,
+                        password: password,
+                    },
+                    success: (data) => {
+                        if (data != 'failed') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Login berhasil!',
+                                text: 'Anda akan diarahkan ke halaman home',
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(function(){
+                                window.location.replace("home.php");
+                            })
+                            
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Email atau password Salah!',
+                                text: 'Silakan cek kembali email dan password',
+                                timer: 2000
+                            })
+                        }
+                    }
+                })
+            }
+        })
+    })
     </script>
 
     <!-- Option 2: Separate Popper and Bootstrap JS -->
